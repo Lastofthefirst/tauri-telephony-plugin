@@ -1,0 +1,52 @@
+{
+  "name": "tauri-plugin-telephony",
+  "version": "0.1.0",
+  "description": "A robust Tauri plugin for telephony functionality including calls and SMS",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "webview-src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "jest",
+    "lint": "eslint webview-src --ext .ts",
+    "format": "prettier --write webview-src/**/*.ts"
+  },
+  "keywords": [
+    "tauri",
+    "plugin",
+    "telephony",
+    "phone",
+    "sms",
+    "calls",
+    "mobile",
+    "android",
+    "ios"
+  ],
+  "author": "Tauri Telephony Plugin Contributors",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lastofthefirst/tauri-telephony-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Lastofthefirst/tauri-telephony-plugin/issues"
+  },
+  "peerDependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}

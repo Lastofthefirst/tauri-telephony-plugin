@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Ringer & SMS App</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .tabs {
+        display: flex;
+        background: #f5f5f5;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        color: #666;
+      }
+
+      .tab.active {
+        background: white;
+        color: #667eea;
+        font-weight: 600;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 30px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section h2 {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .input-group input,
+      .input-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      .input-group input:focus,
+      .input-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .input-group textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn.secondary {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+
+      .status.info {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .status.success {
+        background: #e8f5e9;
+        color: #388e3c;
+      }
+
+      .status.error {
+        background: #ffebee;
+        color: #d32f2f;
+      }
+
+      .incoming-call {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .incoming-call.active {
+        display: flex;
+      }
+
+      .call-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+
+      .call-card h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .call-card .phone-number {
+        font-size: 32px;
+        color: #667eea;
+        margin: 20px 0;
+        font-weight: 600;
+      }
+
+      .call-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .call-btn {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 50px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .call-btn:active {
+        transform: scale(0.95);
+      }
+
+      .call-btn.answer {
+        background: #4caf50;
+        color: white;
+      }
+
+      .call-btn.reject {
+        background: #f44336;
+        color: white;
+      }
+
+      .list-item {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .list-item:last-child {
+        border-bottom: none;
+      }
+
+      .list-item .info {
+        flex: 1;
+      }
+
+      .list-item .name {
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .list-item .details {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .list-item .time {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .permissions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .permission-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 8px;
+      }
+
+      .permission-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .permission-badge.granted {
+        background: #4caf50;
+        color: white;
+      }
+
+      .permission-badge.denied {
+        background: #f44336;
+        color: white;
+      }
+
+      .permission-badge.prompt {
+        background: #ff9800;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📞 Custom Ringer & SMS</h1>
+        <p>Tauri Telephony Plugin Demo</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="calls">Calls</button>
+        <button class="tab" data-tab="messages">Messages</button>
+        <button class="tab" data-tab="contacts">Contacts</button>
+        <button class="tab" data-tab="permissions">Permissions</button>
+      </div>
+
+      <div id="calls" class="tab-content active">
+        <div class="section">
+          <h2>📞 Make a Call</h2>
+          <div class="input-group">
+            <label for="callNumber">Phone Number</label>
+            <input type="tel" id="callNumber" placeholder="+1 234 567 8900" />
+          </div>
+          <button class="btn" id="makeCallBtn">Make Call</button>
+        </div>
+
+        <div class="section">
+          <h2>📋 Call History</h2>
+          <button class="btn secondary" id="loadCallLogsBtn">Load Call Logs</button>
+          <div id="callLogsList" style="margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <div id="messages" class="tab-content">
+        <div class="section">
+          <h2>💬 Send SMS</h2>
+          <div class="input-group">
+            <label for="smsNumber">Recipient</label>
+            <input type="tel" id="smsNumber" placeholder="+1 234 567 8900" />
+          </div>
+          <div class="input-group">
+            <label for="smsMessage">Message</label>
+            <textarea id="smsMessage" placeholder="Type your message here..."></textarea>
+          </div>
+          <button class="btn" id="sendSMSBtn">Send SMS</button>
+        </div>
+
+        <div class="section">
+          <h2>📨 Inbox</h2>
+          <button class="btn secondary" id="loadMessagesBtn">Load Messages</button>
+          <div id="messagesList" style="margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <div id="contacts" class="tab-content">
+        <div class="section">
+          <h2>👥 Contacts</h2>
+          <button class="btn secondary" id="loadContactsBtn">Load Contacts</button>
+          <div id="contactsList" style="margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <div id="permissions" class="tab-content">
+        <div class="section">
+          <h2>🔐 Permissions</h2>
+          <div class="permissions-list" id="permissionsList"></div>
+          <button class="btn" id="requestPermissionsBtn" style="margin-top: 15px;">
+            Request All Permissions
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incoming Call Overlay -->
+    <div class="incoming-call" id="incomingCallOverlay">
+      <div class="call-card">
+        <h2>Incoming Call</h2>
+        <div class="phone-number" id="incomingNumber">+1 234 567 8900</div>
+        <p id="incomingContact" style="color: #666;"></p>
+        <div class="call-actions">
+          <button class="call-btn reject" id="rejectCallBtn">Reject</button>
+          <button class="call-btn answer" id="answerCallBtn">Answer</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
