@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
-    "rootDir": "./webview-src",
+    "rootDir": "./guest-js",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,6 +15,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["webview-src/**/*"],
+  "include": ["guest-js/**/*"],
   "exclude": ["node_modules", "dist"]
 }

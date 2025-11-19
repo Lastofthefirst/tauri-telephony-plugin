@@ -2,190 +2,111 @@ use crate::{
     error::{Error, Result},
     models::*,
 };
-use tauri::{AppHandle, Runtime, State};
-
-#[cfg(target_os = "android")]
-use crate::android::TelephonyManager as PlatformManager;
-
-#[cfg(target_os = "ios")]
-use crate::ios::TelephonyManager as PlatformManager;
-
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
-struct PlatformManager;
-
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
-impl PlatformManager {
-    fn make_call(&self, _phone_number: String) -> Result<()> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn answer_call(&self, _call_id: String) -> Result<()> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn reject_call(&self, _call_id: String) -> Result<()> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn end_call(&self, _call_id: String) -> Result<()> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn get_call_state(&self) -> Result<CallState> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn send_sms(&self, _recipient: String, _message: String) -> Result<String> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn get_sms_messages(&self, _options: MessageQueryOptions) -> Result<Vec<SMSMessage>> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn delete_sms(&self, _message_id: String) -> Result<()> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn get_call_logs(&self, _options: CallLogQueryOptions) -> Result<Vec<CallLog>> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn get_contacts(&self) -> Result<Vec<Contact>> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn request_permissions(&self, _permissions: Vec<Permission>) -> Result<PermissionStatus> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-
-    fn check_permissions(&self, _permissions: Vec<Permission>) -> Result<PermissionStatus> {
-        Err(Error::PlatformNotSupported(
-            "Telephony is only supported on Android and iOS".to_string(),
-        ))
-    }
-}
+use tauri::{AppHandle, Runtime};
 
 /// Make a phone call to the specified number.
 #[tauri::command]
 pub async fn make_call<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     phone_number: String,
 ) -> Result<()> {
     validate_phone_number(&phone_number)?;
 
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.make_call(phone_number)
+        app.run_mobile_plugin("make_call", phone_number)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.make_call(phone_number)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Answer an incoming call.
 #[tauri::command]
 pub async fn answer_call<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     call_id: String,
 ) -> Result<()> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.answer_call(call_id)
+        app.run_mobile_plugin("answer_call", call_id)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.answer_call(call_id)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Reject an incoming call.
 #[tauri::command]
 pub async fn reject_call<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     call_id: String,
 ) -> Result<()> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.reject_call(call_id)
+        app.run_mobile_plugin("reject_call", call_id)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.reject_call(call_id)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// End an active call.
 #[tauri::command]
 pub async fn end_call<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     call_id: String,
 ) -> Result<()> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.end_call(call_id)
+        app.run_mobile_plugin("end_call", call_id)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.end_call(call_id)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Get the current call state.
 #[tauri::command]
-pub async fn get_call_state<R: Runtime>(_app: AppHandle<R>) -> Result<CallState> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+pub async fn get_call_state<R: Runtime>(app: AppHandle<R>) -> Result<CallState> {
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.get_call_state()
+        app.run_mobile_plugin::<()>("get_call_state", ())
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.get_call_state()
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Send an SMS message.
 #[tauri::command]
 pub async fn send_sms<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     options: SMSOptions,
 ) -> Result<String> {
     validate_phone_number(&options.recipient)?;
@@ -194,131 +115,138 @@ pub async fn send_sms<R: Runtime>(
         return Err(Error::InvalidMessage("Message cannot be empty".to_string()));
     }
 
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.send_sms(options.recipient, options.message)
+        app.run_mobile_plugin("send_sms", options)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.send_sms(options.recipient, options.message)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Get SMS messages from the device.
 #[tauri::command]
 pub async fn get_sms_messages<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     options: Option<MessageQueryOptions>,
 ) -> Result<Vec<SMSMessage>> {
     let options = options.unwrap_or_default();
 
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.get_sms_messages(options)
+        app.run_mobile_plugin("get_sms_messages", options)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.get_sms_messages(options)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Delete an SMS message.
 #[tauri::command]
 pub async fn delete_sms<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     message_id: String,
 ) -> Result<()> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.delete_sms(message_id)
+        app.run_mobile_plugin("delete_sms", message_id)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.delete_sms(message_id)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Get call logs from the device.
 #[tauri::command]
 pub async fn get_call_logs<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     options: Option<CallLogQueryOptions>,
 ) -> Result<Vec<CallLog>> {
     let options = options.unwrap_or_default();
 
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.get_call_logs(options)
+        app.run_mobile_plugin("get_call_logs", options)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.get_call_logs(options)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Get contacts from the device.
 #[tauri::command]
-pub async fn get_contacts<R: Runtime>(_app: AppHandle<R>) -> Result<Vec<Contact>> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+pub async fn get_contacts<R: Runtime>(app: AppHandle<R>) -> Result<Vec<Contact>> {
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.get_contacts()
+        app.run_mobile_plugin::<()>("get_contacts", ())
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.get_contacts()
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Request telephony permissions from the user.
 #[tauri::command]
 pub async fn request_permissions<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     permissions: Vec<Permission>,
 ) -> Result<PermissionStatus> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.request_permissions(permissions)
+        app.run_mobile_plugin("request_permissions", permissions)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.request_permissions(permissions)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 
 /// Check the status of telephony permissions.
 #[tauri::command]
 pub async fn check_permissions<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     permissions: Vec<Permission>,
 ) -> Result<PermissionStatus> {
-    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[cfg(mobile)]
     {
-        let manager = PlatformManager::new();
-        manager.check_permissions(permissions)
+        app.run_mobile_plugin("check_permissions", permissions)
+            .map_err(Into::into)
     }
 
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    #[cfg(desktop)]
     {
-        let manager = PlatformManager;
-        manager.check_permissions(permissions)
+        Err(Error::PlatformNotSupported(
+            "Telephony is only supported on Android and iOS".to_string(),
+        ))
     }
 }
 

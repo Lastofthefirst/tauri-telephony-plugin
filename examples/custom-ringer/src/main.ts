@@ -17,7 +17,7 @@ import {
   SMSMessage,
   Contact,
   IncomingCallEvent,
-} from '../../../webview-src/index';
+} from '../../../guest-js/index';
 
 // State
 let currentCallId: string | null = null;

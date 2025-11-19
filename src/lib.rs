@@ -1,6 +1,6 @@
 use tauri::{
     plugin::{Builder, TauriPlugin},
-    Manager, Runtime,
+    Runtime,
 };
 
 pub use models::*;
@@ -9,13 +9,16 @@ mod commands;
 mod error;
 mod models;
 
-#[cfg(target_os = "android")]
-mod android;
+#[cfg(desktop)]
+mod desktop;
 
-#[cfg(target_os = "ios")]
-mod ios;
+#[cfg(mobile)]
+mod mobile;
 
 pub use error::{Error, Result};
+
+#[cfg(target_os = "ios")]
+tauri::ios_plugin_binding!(init_plugin_telephony);
 
 /// Initializes the telephony plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
@@ -35,10 +38,14 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::check_permissions,
         ])
         .setup(|app, api| {
-            #[cfg(mobile)]
-            let handle = api.register_android_plugin("com.plugin.telephony", "TelephonyPlugin")?;
+            #[cfg(target_os = "android")]
+            {
+                api.register_android_plugin("com.plugin.telephony", "TelephonyPlugin")?;
+            }
             #[cfg(target_os = "ios")]
-            let handle = api.register_ios_plugin(init_plugin_telephony)?;
+            {
+                api.register_ios_plugin(init_plugin_telephony)?;
+            }
             Ok(())
         })
         .build()

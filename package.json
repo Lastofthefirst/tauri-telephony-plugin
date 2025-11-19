@@ -7,13 +7,13 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "webview-src"
+    "guest-js"
   ],
   "scripts": {
     "build": "tsup",
     "test": "jest",
-    "lint": "eslint webview-src --ext .ts",
-    "format": "prettier --write webview-src/**/*.ts"
+    "lint": "eslint guest-js --ext .ts",
+    "format": "prettier --write guest-js/**/*.ts"
   },
   "keywords": [
     "tauri",

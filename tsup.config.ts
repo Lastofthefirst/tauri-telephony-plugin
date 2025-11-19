@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['webview-src/index.ts'],
+  entry: ['guest-js/index.ts'],
   format: ['cjs', 'esm'],
   dts: true,
   clean: true,
